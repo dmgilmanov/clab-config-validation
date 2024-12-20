@@ -11,9 +11,6 @@ jobs:
     name: Validate Configurations
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: Install Containerlab
         run: |
           curl -sL https://get.containerlab.dev | sudo bash
@@ -30,4 +27,3 @@ jobs:
         run: |
           echo "Validating topology file"
           sudo containerlab inspect -t topology/clab-topology.yaml
-          
