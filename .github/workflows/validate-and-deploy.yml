@@ -43,26 +43,10 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Transfer and deploy configurations
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: |
-            configs/
-            topology/
-          target: /home/${{ secrets.REMOTE_USER }}/nokia-lab/
 
       - name: Deploy topology with Containerlab
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/${{ secrets.REMOTE_USER }}/nokia-lab/
-            sudo containerlab deploy -t topology/clab-topology.yaml
+        run: |
+          mkdir -p /home/nokia-lab/
+          cd /home/nokia-lab/
+          sudo containerlab deploy -t topology/clab-topology.yaml
+          
