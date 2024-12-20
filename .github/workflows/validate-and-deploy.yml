@@ -1,4 +1,3 @@
-# Test
 name: Validate and Deploy Configurations
 
 on:
@@ -15,15 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Containerlab
+      - name: Install Containerlab
         run: |
-          curl -sL https://get.containerlab.dev | bash
+          curl -sL https://get.containerlab.dev | sudo bash
           containerlab version
 
       - name: Validate topology
         run: |
           echo "Validating topology file"
-          containerlab inspect -t topology/clab-topology.yaml
+          sudo containerlab inspect -t topology/clab-topology.yaml
 
       - name: Validate configuration files
         run: |
@@ -60,4 +59,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/${{ secrets.REMOTE_USER }}/nokia-lab/
-            containerlab deploy -t topology/clab-topology.yaml
+            sudo containerlab deploy -t topology/clab-topology.yaml
