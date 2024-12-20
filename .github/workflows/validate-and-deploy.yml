@@ -34,7 +34,7 @@ jobs:
       - name: Validate configuration files
         run: |
           echo "Validating configuration files"
-          for config in configs/*.conf; do
+          for config in configs/*.cfg; do
             echo "Validating $config"
             grep -E "^[a-zA-Z0-9 ]+$" $config || exit 1
           done
