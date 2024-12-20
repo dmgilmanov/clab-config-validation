@@ -6,4 +6,3 @@ topology:
   nodes:
     srl1:
       kind: nokia_srlinux
-      type: ixrd3
