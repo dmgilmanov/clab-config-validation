@@ -19,6 +19,10 @@ jobs:
           curl -sL https://get.containerlab.dev | sudo bash
           containerlab version
 
+      - name: Install Docker Images
+        run: |
+          docker pull ghcr.io/nokia/srlinux
+
       - name: Deploy topology
         run: sudo containerlab deploy -t topology/clab-topology.yaml
 
