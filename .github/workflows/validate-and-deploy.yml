@@ -40,4 +40,4 @@ jobs:
       - name: Execute show system on SRL
         run: |
           echo "Connecting to SR Linux node"
-          ssh -o StrictHostKeyChecking=no admin@$SRL_IP 'show system license'
+          ssh -o StrictHostKeyChecking=no admin@172.20.20.2 'show system license'
