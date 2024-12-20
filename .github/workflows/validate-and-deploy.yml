@@ -30,14 +30,3 @@ jobs:
         run: |
           echo "Validating topology file"
           sudo containerlab inspect -t topology/clab-topology.yaml
-
-      - name: Get node IP address
-        id: get-ip
-        run: |
-          IP=$(sudo containerlab inspect -t topology/clab-topology.yaml -f '{{ (index .Nodes "srl1").MgmtIPv4Address }}')
-          echo "SRL_IP=${IP%%/*}" >> $GITHUB_ENV
-
-      - name: Execute show system on SRL
-        run: |
-          echo "Connecting to SR Linux node"
-          ssh -o StrictHostKeyChecking=no admin@172.20.20.2 'show system license'
