@@ -18,36 +18,45 @@ jobs:
         run: |
           curl -sL https://get.containerlab.dev | bash
           containerlab version
-      
-      - name: Install SR Linux images
-        rin: |
-          docker pull ghcr.io/nokia/srlinux
 
       - name: Validate topology
-        run: containerlab inspect -t topology/clab-topology.yaml
+        run: |
+          echo "Validating topology file"
+          containerlab inspect -t topology/clab-topology.yaml
 
-#      - name: Validate configuration files
-#        run: |
-#          for config in configs/*.conf; do
-#            echo "Validating $config"
-#            grep -E "^[a-zA-Z0-9 ]+$" $config || exit 1
-#          done
+      - name: Validate configuration files
+        run: |
+          echo "Validating configuration files"
+          for config in configs/*.conf; do
+            echo "Validating $config"
+            grep -E "^[a-zA-Z0-9 ]+$" $config || exit 1
+          done
 
   deploy:
-    name: Deploy to Remote Server
+    name: Deploy to Target Server
     needs: validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Deploy configuration to remote server
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H remote-server >> ~/.ssh/known_hosts
-          scp -r configs/ topology/ user@remote-server:/home/user/nokia-lab/
-          ssh user@remote-server "containerlab deploy -t /home/user/nokia-lab/topology/clab-topology.yaml"
+      - name: Transfer and deploy configurations
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: |
+            configs/
+            topology/
+          target: /home/${{ secrets.REMOTE_USER }}/nokia-lab/
+
+      - name: Deploy topology with Containerlab
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/${{ secrets.REMOTE_USER }}/nokia-lab/
+            containerlab deploy -t topology/clab-topology.yaml
