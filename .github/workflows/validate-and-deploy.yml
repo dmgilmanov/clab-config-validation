@@ -46,6 +46,4 @@ jobs:
 
       - name: Deploy topology with Containerlab
         run: |
-          sudo mkdir -p /home/nokia-lab/
-          sudo cd /home/nokia-lab/
           sudo containerlab deploy -t topology/clab-topology.yaml
