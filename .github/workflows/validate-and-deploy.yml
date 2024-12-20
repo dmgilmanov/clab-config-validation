@@ -23,27 +23,11 @@ jobs:
         run: |
           docker pull ghcr.io/nokia/srlinux
 
-      - name: Deploy topology
+      - name: Validate config on SRL1
         run: sudo containerlab deploy -t topology/clab-topology.yaml
 
-      - name: Validate topology
+      - name: Insect CLAB Topology
         run: |
           echo "Validating topology file"
           sudo containerlab inspect -t topology/clab-topology.yaml
-
-      - name: Validate configuration files
-        run: |
-          echo "Validating configuration files"
-          for config in configs/*.cfg; do
-            echo "Validating $config"
-          done
-
-  deploy:
-    name: Deploy to Target Server
-    needs: validate
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Deploy topology with Containerlab
-        run: |
-          sudo containerlab deploy -t topology/clab-topology.yaml
+          

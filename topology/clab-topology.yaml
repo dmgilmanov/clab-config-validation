@@ -7,3 +7,4 @@ topology:
     srl1:
       kind: nokia_srlinux
       image: ghcr.io/nokia/srlinux
+      startup-config: srl1.cfg
