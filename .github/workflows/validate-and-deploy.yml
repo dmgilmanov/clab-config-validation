@@ -1,0 +1,53 @@
+name: Validate and Deploy Configurations
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate Configurations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Containerlab
+        run: |
+          curl -sL https://get.containerlab.dev | bash
+          containerlab version
+      
+      - name: Install SR Linux images
+        rin: |
+          docker pull ghcr.io/nokia/srlinux
+
+      - name: Validate topology
+        run: containerlab inspect -t topology/clab-topology.yaml
+
+#      - name: Validate configuration files
+#        run: |
+#          for config in configs/*.conf; do
+#            echo "Validating $config"
+#            grep -E "^[a-zA-Z0-9 ]+$" $config || exit 1
+#          done
+
+  deploy:
+    name: Deploy to Remote Server
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy configuration to remote server
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H remote-server >> ~/.ssh/known_hosts
+          scp -r configs/ topology/ user@remote-server:/home/user/nokia-lab/
+          ssh user@remote-server "containerlab deploy -t /home/user/nokia-lab/topology/clab-topology.yaml"
