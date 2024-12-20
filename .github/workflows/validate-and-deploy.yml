@@ -19,6 +19,9 @@ jobs:
           curl -sL https://get.containerlab.dev | sudo bash
           containerlab version
 
+      - name: Deploy topology
+        run: sudo containerlab deploy -t topology/clab-topology.yaml
+
       - name: Validate topology
         run: |
           echo "Validating topology file"
